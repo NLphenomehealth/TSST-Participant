@@ -122,7 +122,10 @@
             <div id="complete" class="screen hidden">
                 <div class="max-w-4xl mx-auto">
                     <h1 class="text-5xl font-extrabold text-green-600 mb-4">Challenge Complete</h1>
-                    <p class="text-gray-700 text-lg mb-4">Thank you for your participation. Please remember to avoid food, beverages (other than water), and strenuous or stressful activity for the next 90 minutes.</p>
+                    <div class="text-gray-700 text-lg mb-4 bg-indigo-50 p-6 rounded-lg">
+                        <p>Thank you for your participation. Please remember to avoid food, beverages (other than water), and strenuous or stressful activity until:</p>
+                        <p id="endTimeDisplay" class="text-4xl font-bold text-indigo-600 my-4"></p>
+                    </div>
                     <p class="text-gray-600">You may now close this page.</p>
                 </div>
             </div>
@@ -141,6 +144,7 @@
         let mainTimer = null;
         let remainingSeconds = 0;
         let lastCommandId = null;
+        let sessionStartTime = null;
 
         const screenConfig = {
             'baseline': { timerId: 'baselineTimer', duration: 180 },
@@ -183,13 +187,13 @@
         }
 
         function initializeSession() {
+            sessionStartTime = new Date(); // Record the session start time
             sessionId = generateSessionId();
             document.getElementById('sessionIdDisplay').textContent = sessionId;
             document.getElementById('sessionIdContainer').classList.remove('hidden');
             const userId = auth.currentUser?.uid || 'anonymous';
             const appId = "tsst-d6836";
             
-            // Get participant's timezone offset in minutes
             const timezoneOffset = new Date().getTimezoneOffset();
             
             gameState = {
@@ -197,7 +201,7 @@
                 sessionId: sessionId,
                 participantId: userId,
                 appId: appId,
-                timezoneOffset: timezoneOffset, // Add timezone to game state
+                timezoneOffset: timezoneOffset,
                 timer: { running: false, value: '0:00' }
             };
             updateGameState(gameState);
@@ -237,7 +241,6 @@
             gameState = { ...gameState, ...newState };
             const appId = gameState.appId || 'tsst-d6836';
             if (db && sessionId) {
-                // We only update, don't merge, to avoid re-triggering commands
                 const sessionRef = doc(db, `artifacts/${appId}/public/data/sessions`, sessionId);
                 setDoc(sessionRef, { 
                     screenId: gameState.screenId,
@@ -256,6 +259,12 @@
             document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
             const screenEl = document.getElementById(screenId);
             if (screenEl) screenEl.classList.remove('hidden');
+
+            if (screenId === 'complete' && sessionStartTime) {
+                const endTime = new Date(sessionStartTime.getTime() + (2 * 60 * 60 * 1000)); // 2 hours
+                const endTimeString = endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                document.getElementById('endTimeDisplay').textContent = endTimeString;
+            }
             
             gameState.screenId = screenId;
             const currentScreenConfig = screenConfig[screenId];
