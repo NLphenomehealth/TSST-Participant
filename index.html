@@ -12,22 +12,10 @@
         body { font-family: 'Inter', sans-serif; }
         .screen { transition: opacity 0.5s ease-in-out; }
         .hidden { display: none; }
-         #skipBtn {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            z-index: 1000;
-            opacity: 0.6;
-            transition: opacity 0.2s;
-        }
-        #skipBtn:hover {
-            opacity: 1;
-        }
     </style>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
     <div id="main-content" class="w-full">
-         <button id="skipBtn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg text-sm" onclick="skipToNext()">Skip →</button>
         <div id="app-container" class="bg-white p-4 sm:p-8 rounded-2xl shadow-2xl max-w-5xl w-full text-center relative transition-all duration-500 mx-auto">
             
             <div id="sessionIdContainer" class="absolute bottom-4 left-4 bg-indigo-100 text-indigo-800 text-sm font-semibold px-4 py-2 rounded-lg shadow-md hidden">
@@ -38,8 +26,7 @@
             <div id="welcome" class="screen">
                 <div class="max-w-4xl mx-auto">
                     <h1 class="text-4xl sm:text-5xl font-extrabold text-gray-800 mb-4">BETA Pilot Study Stress Challenge</h1>
-                    <p class="text-gray-600 mb-8 text-lg">This test will take approximately 30 minutes. Please ensure you have followed all pre-challenge instructions.</p>
-                    <button class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg text-xl" onclick="startProtocol()">Start Challenge</button>
+                    <p class="text-gray-600 mb-8 text-lg">This test will take approximately 30 minutes. Please wait for the researcher to begin the session.</p>
                 </div>
             </div>
 
@@ -60,9 +47,7 @@
                             <li>○ ⚪️ No answer</li>
                         </ul>
                     </div>
-                    <div class="text-center mt-8">
-                        <button class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg text-xl" onclick="showScreen('baseline')">Next</button>
-                    </div>
+                    <p class="text-center font-semibold text-indigo-600 mt-4">Waiting for the researcher to continue...</p>
                 </div>
             </div>
 
@@ -70,7 +55,7 @@
             <div id="baseline" class="screen hidden">
                 <div class="max-w-4xl mx-auto">
                     <h2 class="text-3xl font-bold text-gray-800 mb-4">Resting Baseline</h2>
-                    <p class="text-gray-600 mb-6">Please sit quietly and try to relax for the next 3 minutes.</p>
+                    <p class="text-gray-600 mb-6">Please sit quietly and try to relax. The researcher will start the timer.</p>
                     <div class="text-8xl font-mono font-bold my-4 text-gray-800" id="baselineTimer">3:00</div>
                 </div>
             </div>
@@ -79,7 +64,7 @@
             <div id="speechPreparation" class="screen hidden">
                 <div class="max-w-4xl mx-auto">
                     <h2 class="text-3xl font-bold text-gray-800 mb-4">Speech Preparation</h2>
-                    <p class="text-gray-600 mb-6 text-left">You have 5 minutes to prepare a persuasive speech for your dream job interview. Please think silently and do not write any notes. The timer will begin when the researcher starts it.</p>
+                    <p class="text-gray-600 mb-6 text-left">You have 5 minutes to prepare a persuasive speech for your dream job interview. Please think silently and do not write any notes. The researcher will start the timer.</p>
                     <div class="text-8xl font-mono font-bold my-4 text-gray-800" id="prepTimer">5:00</div>
                 </div>
             </div>
@@ -88,7 +73,7 @@
             <div id="speechDelivery" class="screen hidden">
                 <div class="max-w-4xl mx-auto">
                     <h2 class="text-3xl font-bold text-gray-800 mb-4">Speech Delivery</h2>
-                    <p class="text-gray-600 mb-6">Please begin your 5-minute speech now. Remember, no notes.</p>
+                    <p class="text-gray-600 mb-6">Please begin your 5-minute speech now. Remember, no notes. The researcher will start the timer.</p>
                     <div class="text-8xl font-mono font-bold my-4 text-gray-800" id="speechTimer">5:00</div>
                 </div>
             </div>
@@ -98,11 +83,8 @@
                 <div class="max-w-4xl mx-auto">
                     <h2 class="text-3xl font-bold text-gray-800 mb-4">Mental Math Challenge</h2>
                     <p class="text-gray-600 mb-2">Starting from <strong>2,023</strong>, subtract <strong>17</strong> repeatedly. Speak each result aloud.</p>
-                    <p class="text-gray-500 mb-6">If you make an error, you will be told to start again from 2,023.</p>
+                    <p class="text-gray-500 mb-6">If you make an error, you will be told to start again from 2,023. The researcher will start the timer.</p>
                     <div class="text-8xl font-mono font-bold my-4 text-gray-800" id="mathTimer">5:00</div>
-                    <div id="mathFeedback" class="mt-4 h-12">
-                        <p id="mathError" class="text-red-500 text-2xl font-bold hidden">That is incorrect. Please start over at 2,023.</p>
-                    </div>
                 </div>
             </div>
 
@@ -123,9 +105,7 @@
                             <li>○ ⚪️ No answer</li>
                         </ul>
                     </div>
-                    <div class="text-center mt-8">
-                        <button class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg text-xl" onclick="showScreen('meal')">Next</button>
-                    </div>
+                    <p class="text-center font-semibold text-indigo-600 mt-4">Waiting for the researcher to continue...</p>
                 </div>
             </div>
 
@@ -133,7 +113,7 @@
             <div id="meal" class="screen hidden">
                 <div class="max-w-4xl mx-auto">
                     <h2 class="text-3xl font-bold text-gray-800 mb-4">Meal Time</h2>
-                    <p class="text-gray-600 mb-6">Please consume the provided liquid meal within the next 5 minutes.</p>
+                    <p class="text-gray-600 mb-6">Please consume the provided liquid meal. The researcher will start the 5-minute timer.</p>
                     <div class="text-8xl font-mono font-bold my-4 text-gray-800" id="mealTimer">5:00</div>
                 </div>
             </div>
@@ -151,20 +131,26 @@
 
     <!-- Firebase -->
     <script type="module">
-        // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, serverTimestamp, setLogLevel } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot, serverTimestamp, setLogLevel } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
-        // --- GLOBAL STATE & CONSTANTS ---
         let db, auth;
         let sessionId = null;
-        let gameState = {}; // Single object to hold all state
+        let gameState = {};
         let mainTimer = null;
+        let remainingSeconds = 0;
+        let lastCommandId = null;
 
-        // --- INITIALIZATION ---
+        const screenConfig = {
+            'baseline': { timerId: 'baselineTimer', duration: 180 },
+            'speechPreparation': { timerId: 'prepTimer', duration: 300 },
+            'speechDelivery': { timerId: 'speechTimer', duration: 300 },
+            'mentalArithmetic': { timerId: 'mathTimer', duration: 300 },
+            'meal': { timerId: 'mealTimer', duration: 300 },
+        };
+
         window.onload = function() {
-            // Your web app's Firebase configuration
             const firebaseConfig = {
                 apiKey: "AIzaSyC-Yc9Vr2aWSc1u8YCNVFk48ijcix2Sg2c",
                 authDomain: "tsst-d6836.firebaseapp.com",
@@ -182,13 +168,12 @@
                 signIn();
             } catch (e) {
                 console.error("Firebase initialization failed:", e);
-                document.getElementById('main-content').innerHTML = `<div class="bg-white p-8 rounded-lg shadow-xl"><h1 class="text-2xl font-bold text-red-600">Error: Could not connect to the server.</h1><p class="text-gray-600 mt-2">Please check your connection and refresh the page.</p></div>`;
+                document.getElementById('main-content').innerHTML = `<div class="bg-white p-8 rounded-lg shadow-xl"><h1 class="text-2xl font-bold text-red-600">Error: Could not connect to the server.</h1></div>`;
             }
         };
 
         async function signIn() {
             try {
-                // Always sign in anonymously to the user-provided Firebase project.
                 await signInAnonymously(auth);
                 initializeSession();
             } catch (error) {
@@ -202,85 +187,119 @@
             document.getElementById('sessionIdDisplay').textContent = sessionId;
             document.getElementById('sessionIdContainer').classList.remove('hidden');
             const userId = auth.currentUser?.uid || 'anonymous';
-            const appId = "tsst-d6836"; // Using your project ID as the app ID
-            updateGameState({
+            const appId = "tsst-d6836";
+            
+            gameState = {
                 screenId: 'welcome',
                 sessionId: sessionId,
                 participantId: userId,
-                appId: appId
+                appId: appId,
+                timer: { running: false, value: '0:00' }
+            };
+            updateGameState(gameState);
+            listenForCommands();
+        }
+
+        function listenForCommands() {
+            const appId = "tsst-d6836";
+            const sessionRef = doc(db, `artifacts/${appId}/public/data/sessions`, sessionId);
+            onSnapshot(sessionRef, (doc) => {
+                const data = doc.data();
+                if (data && data.command && data.command.commandId !== lastCommandId) {
+                    lastCommandId = data.command.commandId;
+                    handleCommand(data.command);
+                }
             });
         }
 
-        function updateGameState(newState) {
-            gameState = { ...gameState, ...newState, lastUpdate: serverTimestamp() };
-            const appId = gameState.appId || 'tsst-d6836';
-            if (db && sessionId) {
-                const sessionRef = doc(db, `artifacts/${appId}/public/data/sessions`, sessionId);
-                setDoc(sessionRef, gameState, { merge: true }).catch(e => console.error("Firestore update failed: ", e));
+        function handleCommand(command) {
+            if (command.type === 'screen') {
+                showScreen(command.screenId);
+            } else if (command.type === 'timer') {
+                const currentScreenConfig = screenConfig[gameState.screenId];
+                if (!currentScreenConfig) return;
+
+                if (command.action === 'start') {
+                    startMainTimer(currentScreenConfig.timerId, remainingSeconds > 0 ? remainingSeconds : currentScreenConfig.duration);
+                } else if (command.action === 'stop') {
+                    stopMainTimer();
+                } else if (command.action === 'reset') {
+                    resetMainTimer(currentScreenConfig.timerId, currentScreenConfig.duration);
+                }
             }
         }
 
-        // --- SCREEN & FLOW MANAGEMENT ---
-        window.showScreen = function(screenId) {
+        function updateGameState(newState) {
+            gameState = { ...gameState, ...newState };
+            const appId = gameState.appId || 'tsst-d6836';
+            if (db && sessionId) {
+                // We only update, don't merge, to avoid re-triggering commands
+                const sessionRef = doc(db, `artifacts/${appId}/public/data/sessions`, sessionId);
+                setDoc(sessionRef, { 
+                    screenId: gameState.screenId,
+                    sessionId: gameState.sessionId,
+                    participantId: gameState.participantId,
+                    appId: gameState.appId,
+                    timer: gameState.timer,
+                    lastUpdate: serverTimestamp()
+                 }, { merge: true });
+            }
+        }
+
+        function showScreen(screenId) {
+            stopMainTimer();
             document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
             const screenEl = document.getElementById(screenId);
             if (screenEl) screenEl.classList.remove('hidden');
             
-            updateGameState({ screenId: screenId, timerValue: null, timerRunning: false });
-            
-            // Automatically start timers for screens that have them
-            switch(screenId) {
-                case 'baseline':
-                    startMainTimer('baselineTimer', 3 * 60, () => showScreen('speechPreparation'));
-                    break;
-                case 'speechPreparation':
-                    startMainTimer('prepTimer', 5 * 60, () => showScreen('speechDelivery'));
-                    break;
-                case 'speechDelivery':
-                    startMainTimer('speechTimer', 5 * 60, () => showScreen('mentalArithmetic'));
-                    break;
-                case 'mentalArithmetic':
-                    startMainTimer('mathTimer', 5 * 60, () => showScreen('postTaskSurvey'));
-                    break;
-                case 'meal':
-                    startMainTimer('mealTimer', 5 * 60, () => showScreen('complete'));
-                    break;
+            gameState.screenId = screenId;
+            const currentScreenConfig = screenConfig[screenId];
+            if (currentScreenConfig) {
+                resetMainTimer(currentScreenConfig.timerId, currentScreenConfig.duration);
+            } else {
+                updateGameState({ timer: { running: false, value: '' } });
             }
         }
 
-        window.startProtocol = () => {
-            document.getElementById('sessionIdContainer').classList.add('hidden');
-            showScreen('preBaselineSurvey');
-        };
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${minutes}:${secs.toString().padStart(2, '0')}`;
+        }
 
-        // --- TIMER LOGIC ---
-        function startMainTimer(timerId, seconds, callback) {
+        function startMainTimer(timerId, duration) {
             clearInterval(mainTimer);
-            let remaining = seconds;
+            remainingSeconds = duration;
             const timerElement = document.getElementById(timerId);
             
-            updateGameState({ timerRunning: true });
+            updateGameState({ timer: { running: true, value: formatTime(remainingSeconds) } });
 
-            function tick() {
-                const minutes = Math.floor(remaining / 60);
-                const secs = remaining % 60;
-                const timeString = `${minutes}:${secs.toString().padStart(2, '0')}`;
-                
-                if(timerElement) timerElement.textContent = timeString;
-                updateGameState({ timerValue: timeString });
+            mainTimer = setInterval(() => {
+                remainingSeconds--;
+                if(timerElement) timerElement.textContent = formatTime(remainingSeconds);
+                updateGameState({ timer: { running: true, value: formatTime(remainingSeconds) } });
 
-                if (remaining <= 0) {
-                    clearInterval(mainTimer);
-                    updateGameState({ timerRunning: false });
-                    if (callback) callback();
+                if (remainingSeconds <= 0) {
+                    stopMainTimer();
                 }
-                remaining--;
-            }
-            tick();
-            mainTimer = setInterval(tick, 1000);
+            }, 1000);
         }
 
-        // --- UTILITY FUNCTIONS ---
+        function stopMainTimer() {
+            clearInterval(mainTimer);
+            if (gameState.timer) {
+                updateGameState({ timer: { ...gameState.timer, running: false } });
+            }
+        }
+
+        function resetMainTimer(timerId, duration) {
+            stopMainTimer();
+            remainingSeconds = duration;
+            const timerElement = document.getElementById(timerId);
+            if(timerElement) timerElement.textContent = formatTime(duration);
+            updateGameState({ timer: { running: false, value: formatTime(duration) } });
+        }
+
         function generateSessionId() {
             const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
             let result = '';
@@ -289,19 +308,6 @@
             }
             return result;
         }
-
-        // --- DEVELOPMENT SKIP FUNCTION ---
-        window.skipToNext = () => {
-            clearInterval(mainTimer);
-            const currentScreen = gameState.screenId || 'welcome';
-            const screenOrder = [
-                'welcome', 'preBaselineSurvey', 'baseline', 'speechPreparation',
-                'speechDelivery', 'mentalArithmetic', 'postTaskSurvey', 'meal', 'complete'
-            ];
-            const currentIndex = screenOrder.indexOf(currentScreen);
-            const nextIndex = (currentIndex + 1) % screenOrder.length;
-            showScreen(screenOrder[nextIndex]);
-        };
     </script>
 </body>
 </html>
