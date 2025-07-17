@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BETA Pilot Study Stress Challenge (Participant)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .screen { transition: opacity 0.5s ease-in-out; }
+        .hidden { display: none; }
+         #skipBtn {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+        #skipBtn:hover {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+    <div id="main-content" class="w-full">
+         <button id="skipBtn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg text-sm" onclick="skipToNext()">Skip →</button>
+        <div id="app-container" class="bg-white p-4 sm:p-8 rounded-2xl shadow-2xl max-w-5xl w-full text-center relative transition-all duration-500 mx-auto">
+            
+            <div id="sessionIdContainer" class="absolute bottom-4 left-4 bg-indigo-100 text-indigo-800 text-sm font-semibold px-4 py-2 rounded-lg shadow-md hidden">
+                Session ID: <span id="sessionIdDisplay" class="font-bold"></span>
+            </div>
+
+            <!-- Screen: Welcome -->
+            <div id="welcome" class="screen">
+                <div class="max-w-4xl mx-auto">
+                    <h1 class="text-4xl sm:text-5xl font-extrabold text-gray-800 mb-4">BETA Pilot Study Stress Challenge</h1>
+                    <p class="text-gray-600 mb-8 text-lg">This test will take approximately 30 minutes. Please ensure you have followed all pre-challenge instructions.</p>
+                    <button class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg text-xl" onclick="startProtocol()">Start Challenge</button>
+                </div>
+            </div>
+
+            <!-- Screen: Pre-Baseline Survey -->
+            <div id="preBaselineSurvey" class="screen hidden">
+                <div class="max-w-4xl mx-auto text-left space-y-4">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Log Your Stress Level</h2>
+                    <p>Please open the <strong>MyT1Diabetes</strong> app and open the <strong>I’ve Noticed</strong> feature.</p>
+                    <p>Select ‘Write a note’, tap the text box and enter: <code class="bg-gray-200 text-red-600 p-1 rounded">Stress 0=[your response to the survey below]</code>. After you’ve entered your response, please select ‘Confirm’.</p>
+                    <div class="my-4 p-4 border rounded-lg bg-gray-50">
+                        <p class="font-bold">What is your current stress level?</p>
+                        <ul class="list-none space-y-1 mt-2">
+                            <li>○ 😰 Very stressed</li>
+                            <li>○ 😨 Stressed</li>
+                            <li>○ 😥 Somewhat stressed</li>
+                            <li>○ 😶 Neutral</li>
+                            <li>○ 😌 Not stressed at all</li>
+                            <li>○ ⚪️ No answer</li>
+                        </ul>
+                    </div>
+                    <div class="text-center mt-8">
+                        <button class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg text-xl" onclick="showScreen('baseline')">Next</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Screen: Resting Baseline -->
+            <div id="baseline" class="screen hidden">
+                <div class="max-w-4xl mx-auto">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-4">Resting Baseline</h2>
+                    <p class="text-gray-600 mb-6">Please sit quietly and try to relax for the next 3 minutes.</p>
+                    <div class="text-8xl font-mono font-bold my-4 text-gray-800" id="baselineTimer">3:00</div>
+                </div>
+            </div>
+
+            <!-- Screen: Speech Preparation -->
+            <div id="speechPreparation" class="screen hidden">
+                <div class="max-w-4xl mx-auto">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-4">Speech Preparation</h2>
+                    <p class="text-gray-600 mb-6 text-left">You have 5 minutes to prepare a persuasive speech for your dream job interview. Please think silently and do not write any notes. The timer will begin when the researcher starts it.</p>
+                    <div class="text-8xl font-mono font-bold my-4 text-gray-800" id="prepTimer">5:00</div>
+                </div>
+            </div>
+            
+            <!-- Screen: Speech Delivery -->
+            <div id="speechDelivery" class="screen hidden">
+                <div class="max-w-4xl mx-auto">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-4">Speech Delivery</h2>
+                    <p class="text-gray-600 mb-6">Please begin your 5-minute speech now. Remember, no notes.</p>
+                    <div class="text-8xl font-mono font-bold my-4 text-gray-800" id="speechTimer">5:00</div>
+                </div>
+            </div>
+
+            <!-- Screen: Mental Arithmetic -->
+            <div id="mentalArithmetic" class="screen hidden">
+                <div class="max-w-4xl mx-auto">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-4">Mental Math Challenge</h2>
+                    <p class="text-gray-600 mb-2">Starting from <strong>2,023</strong>, subtract <strong>17</strong> repeatedly. Speak each result aloud.</p>
+                    <p class="text-gray-500 mb-6">If you make an error, you will be told to start again from 2,023.</p>
+                    <div class="text-8xl font-mono font-bold my-4 text-gray-800" id="mathTimer">5:00</div>
+                    <div id="mathFeedback" class="mt-4 h-12">
+                        <p id="mathError" class="text-red-500 text-2xl font-bold hidden">That is incorrect. Please start over at 2,023.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Screen: Post-Task Survey -->
+            <div id="postTaskSurvey" class="screen hidden">
+                 <div class="max-w-4xl mx-auto text-left space-y-4">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Log Your Stress Level</h2>
+                    <p>Please open the <strong>MyT1Diabetes</strong> app and open the <strong>I’ve Noticed</strong> feature.</p>
+                    <p>Select ‘Write a note’, tap the text box and enter: <code class="bg-gray-200 text-red-600 p-1 rounded">Stress 1=[your response to the survey below]</code>. After you’ve entered your response, please select ‘Confirm’.</p>
+                    <div class="my-4 p-4 border rounded-lg bg-gray-50">
+                        <p class="font-bold">What is your current stress level?</p>
+                        <ul class="list-none space-y-1 mt-2">
+                            <li>○ 😰 Very stressed</li>
+                            <li>○ 😨 Stressed</li>
+                            <li>○ 😥 Somewhat stressed</li>
+                            <li>○ 😶 Neutral</li>
+                            <li>○ 😌 Not stressed at all</li>
+                            <li>○ ⚪️ No answer</li>
+                        </ul>
+                    </div>
+                    <div class="text-center mt-8">
+                        <button class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg text-xl" onclick="showScreen('meal')">Next</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Screen: Meal -->
+            <div id="meal" class="screen hidden">
+                <div class="max-w-4xl mx-auto">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-4">Meal Time</h2>
+                    <p class="text-gray-600 mb-6">Please consume the provided liquid meal within the next 5 minutes.</p>
+                    <div class="text-8xl font-mono font-bold my-4 text-gray-800" id="mealTimer">5:00</div>
+                </div>
+            </div>
+
+            <!-- Screen: Complete -->
+            <div id="complete" class="screen hidden">
+                <div class="max-w-4xl mx-auto">
+                    <h1 class="text-5xl font-extrabold text-green-600 mb-4">Challenge Complete</h1>
+                    <p class="text-gray-700 text-lg mb-4">Thank you for your participation. Please remember to avoid food, beverages (other than water), and strenuous or stressful activity for the next 90 minutes.</p>
+                    <p class="text-gray-600">You may now close this page.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, serverTimestamp, setLogLevel } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
+
+        // --- GLOBAL STATE & CONSTANTS ---
+        let db, auth;
+        let sessionId = null;
+        let gameState = {}; // Single object to hold all state
+        let mainTimer = null;
+
+        // --- INITIALIZATION ---
+        window.onload = function() {
+            // Use environment variables for Firebase config if available
+            const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+                apiKey: "YOUR_API_KEY", // Fallback for local testing
+                authDomain: "YOUR_AUTH_DOMAIN",
+                projectId: "YOUR_PROJECT_ID",
+                storageBucket: "YOUR_STORAGE_BUCKET",
+                messagingSenderId: "YOUR_SENDER_ID",
+                appId: "YOUR_APP_ID"
+            };
+            try {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                setLogLevel('error');
+                signIn();
+            } catch (e) {
+                console.error("Firebase initialization failed:", e);
+                document.getElementById('main-content').innerHTML = `<div class="bg-white p-8 rounded-lg shadow-xl"><h1 class="text-2xl font-bold text-red-600">Error: Could not connect to the server.</h1><p class="text-gray-600 mt-2">Please check your connection and refresh the page.</p></div>`;
+            }
+        };
+
+        async function signIn() {
+            try {
+                // Use provided auth token if available, otherwise fall back to anonymous.
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+                initializeSession();
+            } catch (error) {
+                console.error("Authentication Error", error);
+                document.getElementById('main-content').innerHTML = `<h1>Authentication Failed</h1><p>${error.message}</p>`;
+            }
+        }
+
+        function initializeSession() {
+            sessionId = generateSessionId();
+            document.getElementById('sessionIdDisplay').textContent = sessionId;
+            document.getElementById('sessionIdContainer').classList.remove('hidden');
+            const userId = auth.currentUser?.uid || 'anonymous';
+            updateGameState({
+                screenId: 'welcome',
+                sessionId: sessionId,
+                participantId: userId
+            });
+        }
+
+        function updateGameState(newState) {
+            gameState = { ...gameState, ...newState, lastUpdate: serverTimestamp() };
+            const appId = typeof __app_id !== 'undefined' ? __app_id : 'tsst-app';
+            if (db && sessionId) {
+                const sessionRef = doc(db, `artifacts/${appId}/public/data/sessions`, sessionId);
+                setDoc(sessionRef, gameState, { merge: true }).catch(e => console.error("Firestore update failed: ", e));
+            }
+        }
+
+        // --- SCREEN & FLOW MANAGEMENT ---
+        window.showScreen = function(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+            const screenEl = document.getElementById(screenId);
+            if (screenEl) screenEl.classList.remove('hidden');
+            
+            updateGameState({ screenId: screenId, timerValue: null, timerRunning: false });
+            
+            // Automatically start timers for screens that have them
+            switch(screenId) {
+                case 'baseline':
+                    startMainTimer('baselineTimer', 3 * 60, () => showScreen('speechPreparation'));
+                    break;
+                case 'speechPreparation':
+                    startMainTimer('prepTimer', 5 * 60, () => showScreen('speechDelivery'));
+                    break;
+                case 'speechDelivery':
+                    startMainTimer('speechTimer', 5 * 60, () => showScreen('mentalArithmetic'));
+                    break;
+                case 'mentalArithmetic':
+                    startMainTimer('mathTimer', 5 * 60, () => showScreen('postTaskSurvey'));
+                    break;
+                case 'meal':
+                    startMainTimer('mealTimer', 5 * 60, () => showScreen('complete'));
+                    break;
+            }
+        }
+
+        window.startProtocol = () => {
+            document.getElementById('sessionIdContainer').classList.add('hidden');
+            showScreen('preBaselineSurvey');
+        };
+
+        // --- TIMER LOGIC ---
+        function startMainTimer(timerId, seconds, callback) {
+            clearInterval(mainTimer);
+            let remaining = seconds;
+            const timerElement = document.getElementById(timerId);
+            
+            updateGameState({ timerRunning: true });
+
+            function tick() {
+                const minutes = Math.floor(remaining / 60);
+                const secs = remaining % 60;
+                const timeString = `${minutes}:${secs.toString().padStart(2, '0')}`;
+                
+                if(timerElement) timerElement.textContent = timeString;
+                updateGameState({ timerValue: timeString });
+
+                if (remaining <= 0) {
+                    clearInterval(mainTimer);
+                    updateGameState({ timerRunning: false });
+                    if (callback) callback();
+                }
+                remaining--;
+            }
+            tick();
+            mainTimer = setInterval(tick, 1000);
+        }
+
+        // --- UTILITY FUNCTIONS ---
+        function generateSessionId() {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            let result = '';
+            for (let i = 0; i < 6; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
+        // --- DEVELOPMENT SKIP FUNCTION ---
+        window.skipToNext = () => {
+            clearInterval(mainTimer);
+            const currentScreen = gameState.screenId || 'welcome';
+            const screenOrder = [
+                'welcome', 'preBaselineSurvey', 'baseline', 'speechPreparation',
+                'speechDelivery', 'mentalArithmetic', 'postTaskSurvey', 'meal', 'complete'
+            ];
+            const currentIndex = screenOrder.indexOf(currentScreen);
+            const nextIndex = (currentIndex + 1) % screenOrder.length;
+            showScreen(screenOrder[nextIndex]);
+        };
+    </script>
+</body>
+</html>
