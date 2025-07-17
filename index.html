@@ -151,9 +151,10 @@
 
     <!-- Firebase -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, serverTimestamp, setLogLevel } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, serverTimestamp, setLogLevel } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
         // --- GLOBAL STATE & CONSTANTS ---
         let db, auth;
@@ -163,15 +164,16 @@
 
         // --- INITIALIZATION ---
         window.onload = function() {
-            // Use environment variables for Firebase config if available
-            const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-                apiKey: "YOUR_API_KEY", // Fallback for local testing
-                authDomain: "YOUR_AUTH_DOMAIN",
-                projectId: "YOUR_PROJECT_ID",
-                storageBucket: "YOUR_STORAGE_BUCKET",
-                messagingSenderId: "YOUR_SENDER_ID",
-                appId: "YOUR_APP_ID"
+            // Your web app's Firebase configuration
+            const firebaseConfig = {
+                apiKey: "AIzaSyC-Yc9Vr2aWSc1u8YCNVFk48ijcix2Sg2c",
+                authDomain: "tsst-d6836.firebaseapp.com",
+                projectId: "tsst-d6836",
+                storageBucket: "tsst-d6836.appspot.com",
+                messagingSenderId: "55426434749",
+                appId: "1:55426434749:web:441d29af1ce3529a6019d4"
             };
+
             try {
                 const app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
@@ -186,12 +188,8 @@
 
         async function signIn() {
             try {
-                // Use provided auth token if available, otherwise fall back to anonymous.
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
+                // Always sign in anonymously to the user-provided Firebase project.
+                await signInAnonymously(auth);
                 initializeSession();
             } catch (error) {
                 console.error("Authentication Error", error);
@@ -204,16 +202,18 @@
             document.getElementById('sessionIdDisplay').textContent = sessionId;
             document.getElementById('sessionIdContainer').classList.remove('hidden');
             const userId = auth.currentUser?.uid || 'anonymous';
+            const appId = "tsst-d6836"; // Using your project ID as the app ID
             updateGameState({
                 screenId: 'welcome',
                 sessionId: sessionId,
-                participantId: userId
+                participantId: userId,
+                appId: appId
             });
         }
 
         function updateGameState(newState) {
             gameState = { ...gameState, ...newState, lastUpdate: serverTimestamp() };
-            const appId = typeof __app_id !== 'undefined' ? __app_id : 'tsst-app';
+            const appId = gameState.appId || 'tsst-d6836';
             if (db && sessionId) {
                 const sessionRef = doc(db, `artifacts/${appId}/public/data/sessions`, sessionId);
                 setDoc(sessionRef, gameState, { merge: true }).catch(e => console.error("Firestore update failed: ", e));
