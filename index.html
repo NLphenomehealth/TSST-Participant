@@ -189,11 +189,15 @@
             const userId = auth.currentUser?.uid || 'anonymous';
             const appId = "tsst-d6836";
             
+            // Get participant's timezone offset in minutes
+            const timezoneOffset = new Date().getTimezoneOffset();
+            
             gameState = {
                 screenId: 'welcome',
                 sessionId: sessionId,
                 participantId: userId,
                 appId: appId,
+                timezoneOffset: timezoneOffset, // Add timezone to game state
                 timer: { running: false, value: '0:00' }
             };
             updateGameState(gameState);
@@ -240,6 +244,7 @@
                     sessionId: gameState.sessionId,
                     participantId: gameState.participantId,
                     appId: gameState.appId,
+                    timezoneOffset: gameState.timezoneOffset,
                     timer: gameState.timer,
                     lastUpdate: serverTimestamp()
                  }, { merge: true });
