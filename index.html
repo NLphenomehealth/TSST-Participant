@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BETA Pilot Study Stress Challenge (Participant)</title>
+    <title>Sing-a-Song Challenge (Participant)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,6 +12,15 @@
         body { font-family: 'Inter', sans-serif; }
         .screen { transition: opacity 0.5s ease-in-out; }
         .hidden { display: none; }
+        .passage-box {
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            text-align: left;
+            max-width: 48rem;
+            margin: 1rem auto;
+        }
     </style>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
@@ -26,7 +35,7 @@
             <div id="welcome" class="screen">
                 <div class="max-w-4xl mx-auto">
                     <h1 class="text-4xl sm:text-5xl font-extrabold text-gray-800 mb-4">BETA Pilot Study Stress Challenge</h1>
-                    <p class="text-gray-600 mb-8 text-lg">This test will take approximately 30 minutes. Please wait for the researcher to begin the session.</p>
+                    <p class="text-gray-600 mb-8 text-lg">Please wait for the researcher to begin the session.</p>
                 </div>
             </div>
 
@@ -59,34 +68,36 @@
                     <div class="text-8xl font-mono font-bold my-4 text-gray-800" id="baselineTimer">3:00</div>
                 </div>
             </div>
-
-            <!-- Screen: Speech Preparation -->
-            <div id="speechPreparation" class="screen hidden">
-                <div class="max-w-4xl mx-auto">
-                    <h2 class="text-3xl font-bold text-gray-800 mb-4">Speech Preparation</h2>
-                    <p class="text-gray-600 mb-6 text-left">You have 5 minutes to prepare a persuasive speech for your dream job interview. Please think silently and do not write any notes. The researcher will start the timer.</p>
-                    <div class="text-8xl font-mono font-bold my-4 text-gray-800" id="prepTimer">5:00</div>
-                </div>
-            </div>
             
-            <!-- Screen: Speech Delivery -->
-            <div id="speechDelivery" class="screen hidden">
+            <!-- Screen: Task Introduction -->
+            <div id="taskIntroduction" class="screen hidden">
                 <div class="max-w-4xl mx-auto">
-                    <h2 class="text-3xl font-bold text-gray-800 mb-4">Speech Delivery</h2>
-                    <p class="text-gray-600 mb-6">Please begin your 5-minute speech now. Remember, no notes. The researcher will start the timer.</p>
-                    <div class="text-8xl font-mono font-bold my-4 text-gray-800" id="speechTimer">5:00</div>
+                    <h2 class="text-3xl font-bold text-gray-800 mb-4">Instructions</h2>
+                    <p class="text-gray-600 mb-6">Please listen to the researcher for instructions.</p>
+                    <p class="text-center font-semibold text-indigo-600 mt-4">Waiting for the researcher to continue...</p>
                 </div>
             </div>
 
-            <!-- Screen: Mental Arithmetic -->
-            <div id="mentalArithmetic" class="screen hidden">
+            <!-- Screen: Generic Countdown -->
+            <div id="countdown" class="screen hidden">
                 <div class="max-w-4xl mx-auto">
-                    <h2 class="text-3xl font-bold text-gray-800 mb-4">Mental Math Challenge</h2>
-                    <p class="text-gray-600 mb-2">Starting from <strong>2,023</strong>, subtract <strong>17</strong> repeatedly. Speak each result aloud.</p>
-                    <p class="text-gray-500 mb-6">If you make an error, you will be told to start again from 2,023. The researcher will start the timer.</p>
-                    <div class="text-8xl font-mono font-bold my-4 text-gray-800" id="mathTimer">5:00</div>
+                    <h2 class="text-3xl font-bold text-gray-800 mb-4">Countdown</h2>
+                    <p class="text-gray-600 mb-6">Please remain seated and wait quietly.</p>
+                    <div class="text-8xl font-mono font-bold my-4 text-gray-800" id="countdownTimer">1:00</div>
                 </div>
             </div>
+
+            <!-- Screen: Silent Reading -->
+            <div id="silentReading" class="screen hidden"></div>
+
+            <!-- Screen: Read Aloud -->
+            <div id="readAloud" class="screen hidden"></div>
+            
+            <!-- Screen: Read Aloud Challenge Instructions -->
+            <div id="challengeInstructions" class="screen hidden"></div>
+            
+            <!-- Screen: Sing a Song -->
+            <div id="singASong" class="screen hidden"></div>
 
             <!-- Screen: Post-Task Survey -->
             <div id="postTaskSurvey" class="screen hidden">
@@ -134,9 +145,9 @@
 
     <!-- Firebase -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot, serverTimestamp, setLogLevel } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot, serverTimestamp, setLogLevel } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
         let db, auth;
         let sessionId = null;
@@ -145,23 +156,40 @@
         let remainingSeconds = 0;
         let lastCommandId = null;
         let sessionStartTime = null;
+        let heartbeatInterval = null;
+        let allConfigs = {}; 
 
         const screenConfig = {
             'baseline': { timerId: 'baselineTimer', duration: 180 },
-            'speechPreparation': { timerId: 'prepTimer', duration: 300 },
-            'speechDelivery': { timerId: 'speechTimer', duration: 300 },
-            'mentalArithmetic': { timerId: 'mathTimer', duration: 300 },
+            'countdown': { timerId: 'countdownTimer', duration: 60 },
+            'silentReading': { timerId: 'taskTimer', duration: 12 },
+            'readAloud': { timerId: 'taskTimer', duration: 12 },
+            'challengeInstructions': { timerId: 'taskTimer', duration: 60 },
+            'singASong': { timerId: 'taskTimer', duration: 60 },
             'meal': { timerId: 'mealTimer', duration: 300 },
         };
 
+        function initializeContent() {
+             allConfigs = {
+                'silentReading': { taskContent: { title: 'Read the following passage Silently', passageTitle: 'Vacuum Cleaner', passageBody: 'A vacuum cleaner, also known simply as a vacuum, is a device that uses suction-often with agitation-to remove dirt and debris from carpets, hard floors, and other surfaces. The dirt is collected into a dust bag or plastic bin. Vacuum cleaners come in many forms, including stick, handheld, upright, canister, and specialized shop vacuums that can handle both solids and liquids.\n\nAlthough vacuum cleaner and vacuum are neutral terms, in some countries (e.g., the UK and Ireland) hoover is used generically (and as a verb) after the Hoover Company, one of the earliest producers of the device. In parts of New Zealand it\'s sometimes called a lux. The term sweeper may also be used, though it can refer specifically to a carpet sweeper.\n\nThe first manual vacuum designs using bellows appeared in the 1860s; motorized versions followed at the turn of the 20th century, leading to rapid innovation during that decade.'}},
+                'readAloud1_content': { taskContent: { title: 'Read the following passage Aloud', passageTitle: 'Paper Clip', passageBody: 'A paper clip (or paperclip) is a small steel-wire device (sometimes plastic-coated) bent into loops that hold sheets of paper together by torsion and friction. Most modern clips are based on the Gem type introduced in the 1890s, characterized by one-and-a-half loops.\n\nPaper clips have an oblong shape with straight sides, though triangular, circular, and novelty shapes exist. Alternatives include two-piece clamping systems and spring-fastened binder clips. Their simplicity and versatility have made them ubiquitous in offices, schools, and creative projects. A typical metal paper clip weighs about one gram.'}},
+                'readAloud2_content': { taskContent: { title: 'Read the following passage Aloud', passageTitle: 'Wood', passageBody: 'Wood is the structural xylem tissue in the stems and roots of trees and other woody plants-a composite of cellulose fibers (strong under tension) embedded in lignin (resistant to compression). In living trees it provides support and transports water and nutrients.\n\nHumans have used wood for millennia as fuel, construction material, and for tools, weapons, furniture, paper, and, more recently, purified cellulose products such as cellophane. As of 2020, global forest growing stock totaled roughly 557 billion m³, with nearly 4 billion m³ harvested annually (dominantly for construction and furniture). Wood science has been an established field since the early 20th century.'}},
+                'challengeInstructions': { taskContent: { title: 'Read the following Challenge instructions Aloud', passageTitle: '', passageBody: 'You will now prepare for a singing challenge. Your performance will be recorded and evaluated by a music professional. Songs you may be asked to sing are listed below. If you finish a song before the time ends. Start over from the beginning until the timer reaches 00:00.\n\nOnce you see the screen with lyrics to the song, begin singing!\n\nSong list:\n• I\'m a Little Teapot\n• Twinkle, Twinkle, Little Star\n• Mary Had a Little Lamb'}},
+                'singASong1_content': { taskContent: { title: 'Sing the following song Aloud', passageTitle: 'I\'m a Little Teapot', passageBody: 'Verse 1\nI\'m a little teapot, short and stout. Here is my handle, here is my spout. When the water\'s boiling, hear me shout: "Tip me over, pour me out!"\n\nVerse 2\nI\'m a little teapot, short and stout. Here is my handle, here is my spout. I can change my handle or my spout-"Tip me over, pour me out!"\n\nVerse 3\nI\'m a little teapot, short and stout. Here is my handle, here is my spout. When the water\'s boiling, hear me shout: "Tip me over, pour me out!"\n\nVerse 4\nI\'m a little teapot, short and stout. Here is my handle, here is my spout. I can change my handle or my spout - "Tip me over, pour me out!"'}},
+                'singASong2_content': { taskContent: { title: 'Sing the following song Aloud', passageTitle: 'Twinkle, Twinkle, Little Star', passageBody: 'Twinkle, twinkle, little star, How I wonder what you are!\n\nUp above the world so high, Like a diamond in the sky.\n\n\nWhen the blazing sun is set, And the grass with dew is wet,\n\nThen you show your little light-Twinkle, twinkle, all the night.\n\n\nThen the traveler in the dark. Thanks you for your tiny spark;\n\nHe could not see which way to go. If you did not twinkle so.\n\n\nAs your bright and tiny spark. Lights the traveler in the dark-\n\nThough I know not what you are, Twinkle, twinkle, little star.'}},
+                'singASong3_content': { taskContent: { title: 'Sing the following song Aloud', passageTitle: 'Mary Had a Little Lamb', passageBody: 'Verse 1:\nMary had a little lamb, little lamb, little lamb; Mary had a little lamb, its fleece was white as snow.\n\nVerse 2:\nAnd everywhere that Mary went, Mary went, Mary went; and everywhere that Mary went, the lamb was sure to go.\n\nVerse 3:\nIt followed her to school one day, school one day, school one day; it followed her to school one day, which was against the rule.\n\nVerse 4:\nIt made the children laugh and play, laugh and play, laugh and play; it made the children laugh and play to see the lamb at school.\n\nVerse 5:\nAnd so the teacher sent it out, sent it out, sent it out; and so the teacher sent it out, but still it lingered near.\n\nVerse 6:\nIt stood and waited round about, round about, round about; it stood and waited round about, till Mary did appear.\n\nVerse 7:\n"Why does the lamb love Mary so?" the little children cry.'}}
+            };
+        }
+
         window.onload = function() {
+            initializeContent();
             const firebaseConfig = {
-                apiKey: "AIzaSyC-Yc9Vr2aWSc1u8YCNVFk48ijcix2Sg2c",
-                authDomain: "tsst-d6836.firebaseapp.com",
-                projectId: "tsst-d6836",
-                storageBucket: "tsst-d6836.appspot.com",
-                messagingSenderId: "55426434749",
-                appId: "1:55426434749:web:441d29af1ce3529a6019d4"
+                apiKey: "AIzaSyDU_9f8mWWP6GHcJzW0BnzsmYUCvIBXooU",
+                authDomain: "sing-a-song-c80f1.firebaseapp.com",
+                projectId: "sing-a-song-c80f1",
+                storageBucket: "sing-a-song-c80f1.firebasestorage.app",
+                messagingSenderId: "542681033418",
+                appId: "1:542681033418:web:6bc5b4e8ecca456233"
             };
 
             try {
@@ -186,13 +214,26 @@
             }
         }
 
+        function startHeartbeat() {
+            stopHeartbeat();
+            heartbeatInterval = setInterval(() => {
+                if (sessionId) {
+                    updateGameState({ participantHeartbeat: serverTimestamp() });
+                }
+            }, 30000);
+        }
+
+        function stopHeartbeat() {
+            clearInterval(heartbeatInterval);
+        }
+
         function initializeSession() {
-            sessionStartTime = new Date(); // Record the session start time
+            sessionStartTime = new Date();
             sessionId = generateSessionId();
             document.getElementById('sessionIdDisplay').textContent = sessionId;
             document.getElementById('sessionIdContainer').classList.remove('hidden');
             const userId = auth.currentUser?.uid || 'anonymous';
-            const appId = "tsst-d6836";
+            const appId = "sing-a-song-c80f1"; 
             
             const timezoneOffset = new Date().getTimezoneOffset();
             
@@ -202,16 +243,19 @@
                 participantId: userId,
                 appId: appId,
                 timezoneOffset: timezoneOffset,
-                timer: { running: false, value: '0:00' }
+                timer: { running: false, value: '0:00' },
+                taskContent: {}
             };
             updateGameState(gameState);
             listenForCommands();
+            startHeartbeat();
         }
 
         function listenForCommands() {
-            const appId = "tsst-d6836";
+            const appId = "sing-a-song-c80f1";
             const sessionRef = doc(db, `artifacts/${appId}/public/data/sessions`, sessionId);
             onSnapshot(sessionRef, (doc) => {
+                if (!doc.exists()) return;
                 const data = doc.data();
                 if (data && data.command && data.command.commandId !== lastCommandId) {
                     lastCommandId = data.command.commandId;
@@ -222,7 +266,7 @@
 
         function handleCommand(command) {
             if (command.type === 'screen') {
-                showScreen(command.screenId);
+                showScreen(command.screenId, command.taskContent);
             } else if (command.type === 'timer') {
                 const currentScreenConfig = screenConfig[gameState.screenId];
                 if (!currentScreenConfig) return;
@@ -239,23 +283,25 @@
 
         function updateGameState(newState) {
             gameState = { ...gameState, ...newState };
-            const appId = gameState.appId || 'tsst-d6836';
+            const appId = gameState.appId || 'sing-a-song-c80f1';
             if (db && sessionId) {
                 const sessionRef = doc(db, `artifacts/${appId}/public/data/sessions`, sessionId);
                 setDoc(sessionRef, { 
-                    screenId: gameState.screenId,
-                    sessionId: gameState.sessionId,
-                    participantId: gameState.participantId,
-                    appId: gameState.appId,
-                    timezoneOffset: gameState.timezoneOffset,
-                    timer: gameState.timer,
+                    ...gameState,
                     lastUpdate: serverTimestamp()
                  }, { merge: true });
             }
         }
 
-        function showScreen(screenId) {
+        function showScreen(screenId, taskContent = {}) {
             stopMainTimer();
+
+            // FIX: Clear previous dynamic content to prevent duplicate element IDs
+            ['silentReading', 'readAloud', 'challengeInstructions', 'singASong'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.innerHTML = ''; 
+            });
+
             document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
             const screenEl = document.getElementById(screenId);
             if (screenEl) screenEl.classList.remove('hidden');
@@ -265,14 +311,36 @@
                 const endTimeString = endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                 document.getElementById('endTimeDisplay').textContent = endTimeString;
             }
+
+            if (['silentReading', 'readAloud', 'challengeInstructions', 'singASong'].includes(screenId)) {
+                screenEl.innerHTML = buildTaskScreen(screenId, taskContent);
+            }
             
             gameState.screenId = screenId;
+            gameState.taskContent = taskContent;
             const currentScreenConfig = screenConfig[screenId];
             if (currentScreenConfig) {
                 resetMainTimer(currentScreenConfig.timerId, currentScreenConfig.duration);
             } else {
                 updateGameState({ timer: { running: false, value: '' } });
             }
+        }
+
+        function buildTaskScreen(screenId, content) {
+            const timerId = screenConfig[screenId].timerId;
+            const duration = screenConfig[screenId].duration;
+            const timerDisplay = formatTime(duration);
+
+            return `
+                <div class="max-w-4xl mx-auto">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-2">${content.title || ''}</h2>
+                    <div class="text-8xl font-mono font-bold my-2 text-gray-800" id="${timerId}">${timerDisplay}</div>
+                    <div class="passage-box">
+                        <h3 class="text-2xl font-bold mb-4">${content.passageTitle || ''}</h3>
+                        <div class="text-gray-700 space-y-4 whitespace-pre-wrap">${content.passageBody || ''}</div>
+                    </div>
+                </div>
+            `;
         }
 
         function formatTime(seconds) {
